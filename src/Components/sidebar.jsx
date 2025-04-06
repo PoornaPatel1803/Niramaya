@@ -1,83 +1,82 @@
-import React from "react";
-import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
-import { FaHome, FaUserEdit, FaBug, FaClipboardList } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import darklogo from "../assets/darklogo.svg";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  FaHome,
+  FaTachometerAlt,
+  FaUserEdit,
+  FaBug,
+  FaChevronLeft,
+  FaChevronRight,
+  FaFileMedicalAlt,
+} from "react-icons/fa";
+import NiramayaLogo from "../assets/darkLogo.svg"
 
-const Sidebar = ({ userType, isOpen, setIsOpen }) => {
-  // Dynamic dashboard link
-  const dashboardLink =
-    userType === "doctor" ? "/doctor-dashboard" : "/patient-dashboard";
+const Sidebar = ({ userType = "patient", isOpen = true, setIsOpen }) => {
+  const collapsed = !isOpen;
+  const location = useLocation();
+
+  const commonItems = [
+    { label: "Home", icon: <FaHome />, path: "/" },
+    { label: "Edit Profile", icon: <FaUserEdit />, path: "/edit-profile" },
+    { label: "Report a Problem", icon: <FaBug />, path: "/report-problem" },
+  ];
+
+  const doctorItems = [
+    { label: "Dashboard", icon: <FaTachometerAlt />, path: "/doctor-dashboard" },
+  ];
+
+  const patientItems = [
+    { label: "My Records", icon: <FaFileMedicalAlt />, path: "/patient-dashboard" },
+  ];
+
+  const menuItems =
+    userType === "doctor"
+      ? [...commonItems.slice(0, 1), ...doctorItems, ...commonItems.slice(1)]
+      : [...commonItems.slice(0, 1), ...patientItems, ...commonItems.slice(1)];
 
   return (
     <div
-      className={`fixed top-0 left-0 ${
-        isOpen ? "w-64" : "w-16"
-      } bg-gray-800 h-screen p-4 transition-all duration-300 flex flex-col`}
+      className={`fixed top-0 left-0 h-screen bg-[#1f2937] text-white z-50 flex flex-col justify-between transition-all duration-300 ${
+        collapsed ? "w-20" : "w-64"
+      }`}
     >
-      {/* Logo - Only Visible When Expanded */}
-      {isOpen && (
-        <div className="flex items-center justify-center">
-          <img src={darklogo} alt="Logo" className="w-28 h-28 transition-all" />
+      <div>
+        {/* Logo */}
+        <div className="flex items-center justify-center py-6 text-teal-400 text-xl font-bold">
+          {!collapsed && (
+            <>
+              <img src={NiramayaLogo} alt="" className="p-11"/> 
+            </>
+          )}
         </div>
-      )}
 
-      {/* Navigation Menu */}
-      <nav className="flex flex-col items-center w-full gap-4 flex-grow mt-6">
-        <SidebarItem to="/" icon={<FaHome />} label="Home" isOpen={isOpen} />
-        <SidebarItem
-          to={dashboardLink}
-          icon={<FaClipboardList />}
-          label="Dashboard"
-          isOpen={isOpen}
-        />
+        {/* Menu */}
+        <nav className="flex flex-col gap-4 px-4">
+          {menuItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.path}
+              className={`flex items-center gap-4 p-2 rounded-md hover:bg-teal-600 transition ${
+                location.pathname === item.path ? "bg-teal-700" : ""
+              }`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              {!collapsed && <span className="text-sm">{item.label}</span>}
+            </Link>
+          ))}
+        </nav>
+      </div>
 
-        {userType === "doctor" && (
-          <SidebarItem
-            to="/logs"
-            icon={<FaClipboardList />}
-            label="Check Logs"
-            isOpen={isOpen}
-          />
-        )}
-
-        <SidebarItem
-          to="/edit-profile"
-          icon={<FaUserEdit />}
-          label="Edit Profile"
-          isOpen={isOpen}
-        />
-
-        <SidebarItem
-          to="/report-problem"
-          icon={<FaBug />}
-          label="Report a Problem"
-          isOpen={isOpen}
-        />
-      </nav>
-
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="mt-auto mb-4 mx-auto text-white text-2xl bg-gray-700 p-2 rounded-lg"
-      >
-        {isOpen ? <GoSidebarCollapse /> : <GoSidebarExpand />}
-      </button>
+      {/* Collapse Button */}
+      <div className="flex justify-center p-4">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="bg-gray-700 hover:bg-gray-600 p-2 rounded-lg"
+        >
+          {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
+        </button>
+      </div>
     </div>
-  );
-};
-
-const SidebarItem = ({ to, icon, label, isOpen }) => {
-  return (
-    <Link
-      to={to}
-      className={`flex items-center w-full py-3 px-4 rounded-lg text-white transition-all duration-300 ${
-        isOpen ? "justify-start" : "justify-center"
-      } hover:bg-gray-700`}
-    >
-      <span className="text-xl">{icon}</span>
-      {isOpen && <span className="whitespace-nowrap ml-3">{label}</span>}
-    </Link>
   );
 };
 

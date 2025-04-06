@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Sidebar from "../Components/sideBar";
+import Sidebar from "../Components/sidebar";
 import { useNavigate } from "react-router-dom";
 
 const PatientDashboard = () => {
